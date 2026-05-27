@@ -1,0 +1,8 @@
+numpy
+scipy
+pandas
+matplotlib
+scikit-learn
+tensorflow
+jupyter
+git+https://github.com/joselado/dmrgpy.git
