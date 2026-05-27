@@ -7,8 +7,8 @@ import keras
 import numpy as np
 import pandas as pd
 
-# Optional DMRGPy path inside repo
 ROOT = Path(__file__).resolve().parents[1]
+
 DMRGPY_PATH = ROOT / "external" / "dmrgpy" / "src"
 sys.path.append(str(DMRGPY_PATH))
 
@@ -35,11 +35,11 @@ def cut_and_resample_to_200(y, bias_mev, cut_mev=50.0, n_out=200):
 
 def cut_and_resample_map_to_200(didv_map, bias_mev, cut_mev=50.0, n_out=200):
     didv_map = np.asarray(didv_map, np.float32)
-    n_sites, _ = didv_map.shape
+    L, _ = didv_map.shape
 
-    out = np.zeros((n_sites, n_out), dtype=np.float32)
+    out = np.zeros((L, n_out), dtype=np.float32)
 
-    for site in range(n_sites):
+    for site in range(L):
         out[site], _ = cut_and_resample_to_200(
             didv_map[site],
             bias_mev,
@@ -67,15 +67,14 @@ def baseline_and_bandscale_site(
     y = y.astype(np.float32).copy()
 
     b1 = max(1, min(res, mev_to_idx(baseline_mev, res, full_mev)))
-    baseline = float(np.mean(y[:b1]))
-    y = y - baseline
+    y -= float(np.mean(y[:b1]))
 
     cidx = max(1, min(res, mev_to_idx(cut_mev, res, full_mev)))
     s0 = max(0, min(cidx - 1, mev_to_idx(scale_band_mev[0], res, full_mev)))
     s1 = max(s0 + 1, min(cidx, mev_to_idx(scale_band_mev[1], res, full_mev)))
 
     scale = float(np.mean(np.abs(y[s0:s1]))) + eps
-    y = y / scale
+    y /= scale
 
     if clip is not None:
         y = np.clip(y, clip[0], clip[1])
@@ -136,7 +135,7 @@ def predict_chain_J(data, L, res, model):
     return J_pred
 
 
-def load_experiment_csv(csv_path, L, bias_train, negative=False):
+def load_symmetric_experiment_csv(csv_path, L, bias_train):
     df = pd.read_csv(csv_path)
 
     required_columns = {"bias_meV", "site", "didv_A"}
@@ -160,10 +159,6 @@ def load_experiment_csv(csv_path, L, bias_train, negative=False):
         x = d["bias_meV"].to_numpy()
         y = d["didv_A"].to_numpy()
 
-        if negative:
-            x = x[::-1] * -1
-            y = y[::-1]
-
         didv[i, :] = np.interp(bias_train, x, y)
 
     return didv
@@ -171,43 +166,25 @@ def load_experiment_csv(csv_path, L, bias_train, negative=False):
 
 def load_symmetric_experiment_chain(chain_name, L, bias_train, data_dir):
     """
-    Expected file names:
+    Expected file name:
 
-        data/experimental/{chain_name}_L{L}_POS.csv
-        data/experimental/{chain_name}_L{L}_NEG.csv
+        data/experimental/{chain_name}_L{L}_SYM.csv
 
     Example:
 
-        data/experimental/ChainIH_L6_POS.csv
-        data/experimental/ChainIH_L6_NEG.csv
+        data/experimental/ChainIH_L6_SYM.csv
     """
 
-    pos_csv = data_dir / f"{chain_name}_L{L}_POS.csv"
-    neg_csv = data_dir / f"{chain_name}_L{L}_NEG.csv"
+    sym_csv = data_dir / f"{chain_name}_L{L}_SYM.csv"
 
-    if not pos_csv.exists():
-        raise FileNotFoundError(f"Missing file: {pos_csv}")
+    if not sym_csv.exists():
+        raise FileNotFoundError(f"Missing file: {sym_csv}")
 
-    if not neg_csv.exists():
-        raise FileNotFoundError(f"Missing file: {neg_csv}")
-
-    didv_pos = load_experiment_csv(
-        pos_csv,
+    return load_symmetric_experiment_csv(
+        sym_csv,
         L=L,
         bias_train=bias_train,
-        negative=False,
     )
-
-    didv_neg = load_experiment_csv(
-        neg_csv,
-        L=L,
-        bias_train=bias_train,
-        negative=True,
-    )
-
-    didv_sym = 0.5 * (didv_pos + didv_neg)
-
-    return didv_sym, didv_pos, didv_neg
 
 
 def build_spinchain_from_J(J):
@@ -306,7 +283,7 @@ def run_predict_for_seed(
     for L in lengths:
         print(f"Processing {chain_name}, L={L}, seed={seed}")
 
-        didv_sym, didv_pos, didv_neg = load_symmetric_experiment_chain(
+        didv_sym = load_symmetric_experiment_chain(
             chain_name=chain_name,
             L=L,
             bias_train=bias_train,
@@ -360,8 +337,6 @@ def run_predict_for_seed(
         result_dict[f"{prefix}_J_repeats"] = np.stack(Js, axis=0).astype(np.float32)
         result_dict[f"{prefix}_gap_repeats"] = np.asarray(gaps, dtype=np.float32)
 
-        result_dict[f"{prefix}_didv_pos"] = didv_pos.astype(np.float32)
-        result_dict[f"{prefix}_didv_neg"] = didv_neg.astype(np.float32)
         result_dict[f"{prefix}_didv_sym"] = didv_sym.astype(np.float32)
         result_dict[f"{prefix}_didv_sym_cut"] = didv_cut.astype(np.float32)
         result_dict[f"{prefix}_didv_sym_norm"] = didv_norm.reshape(L, res).astype(np.float32)
@@ -375,68 +350,23 @@ def parse_lengths(lengths_string):
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Predict bond-resolved exchange couplings from experimental STM spectra."
+        description="Predict bond-resolved exchange couplings from symmetrized experimental STM spectra."
     )
 
-    parser.add_argument(
-        "--chain",
-        type=str,
-        required=True,
-        help="Chain name, e.g. ChainIH.",
-    )
-
-    parser.add_argument(
-        "--lengths",
-        type=str,
-        required=True,
-        help="Comma-separated chain lengths, e.g. 4,6,10,16.",
-    )
-
-    parser.add_argument(
-        "--seed",
-        type=int,
-        required=True,
-        help="Seed of the trained model ensemble member.",
-    )
-
-    parser.add_argument(
-        "--mode",
-        choices=["enhanced", "theory"],
-        default="enhanced",
-        help="Model type to use. Experimental inference should usually use enhanced.",
-    )
-
-    parser.add_argument(
-        "--cut",
-        type=float,
-        default=50.0,
-        help="Bias cutoff in meV.",
-    )
-
-    parser.add_argument(
-        "--n-repeats",
-        type=int,
-        default=1,
-        help="Number of repeated predictions.",
-    )
-
+    parser.add_argument("--chain", type=str, required=True)
+    parser.add_argument("--lengths", type=str, required=True)
+    parser.add_argument("--seed", type=int, required=True)
+    parser.add_argument("--mode", choices=["enhanced", "theory"], default="enhanced")
+    parser.add_argument("--cut", type=float, default=50.0)
+    parser.add_argument("--n-repeats", type=int, default=1)
     parser.add_argument(
         "--data-dir",
         type=str,
         default=str(ROOT / "data" / "experimental"),
-        help="Directory containing experimental CSV files.",
     )
-
-    parser.add_argument(
-        "--output-dir",
-        type=str,
-        default=None,
-        help="Output directory. Default: results/predictions/{chain}.",
-    )
+    parser.add_argument("--output-dir", type=str, default=None)
 
     args = parser.parse_args()
-
-    lengths = parse_lengths(args.lengths)
 
     output_dir = (
         Path(args.output_dir)
@@ -447,7 +377,7 @@ def main():
     run_predict_for_seed(
         chain_name=args.chain,
         seed=args.seed,
-        lengths=lengths,
+        lengths=parse_lengths(args.lengths),
         cut_mev=args.cut,
         n_repeats=args.n_repeats,
         model_mode=args.mode,
