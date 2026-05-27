@@ -1,0 +1,9 @@
+Training Report - Seed 44
+==================================================
+Job ID: 2
+Date: 2026-03-12 19:33:07
+
+Fidelity J1: 0.9940
+Fidelity J2: 0.9940
+Fidelity Total: 0.9940
+Best Validation Loss: 0.000557

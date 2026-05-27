@@ -1,0 +1,9 @@
+Training Report - Seed 51
+==================================================
+Job ID: 9
+Date: 2026-03-12 19:32:38
+
+Fidelity J1: 0.9936
+Fidelity J2: 0.9936
+Fidelity Total: 0.9936
+Best Validation Loss: 0.000546
