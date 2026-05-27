@@ -25,6 +25,7 @@ The method allows the extraction of spatially varying exchange interactions \(J_
 ```text
 data/           Experimental and synthetic datasets
 models/         Trained neural network models
+src/            Source Code
 ```
 
 ---
