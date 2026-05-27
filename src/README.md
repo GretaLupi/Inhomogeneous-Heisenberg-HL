@@ -57,3 +57,57 @@ SLURM_ARRAY_TASK_ID
 ```
 
 to generate independent ensemble members with different random seeds.
+
+### 5. Fidelity versus noise analysis
+
+After training an ensemble of models, the robustness of the reconstruction can be evaluated by adding controlled noise to the test spectra and computing the prediction fidelity.
+
+For the ideal theoretical ensemble:
+
+```bash
+python src/fidelity_noise_analysis.py --mode theory
+```
+
+For the experimental-like enhanced ensemble:
+
+```bash
+python src/fidelity_noise_analysis.py --mode enhanced
+```
+
+The noise levels are defined as:
+
+```python
+noise_levels = alpha * A
+```
+
+with:
+
+```text
+A = 0.25   for theory
+A = 1.2    for enhanced
+```
+
+and:
+
+```python
+alpha = [0.0, 0.05, 0.10, 0.15, 0.20]
+```
+
+The following outputs are automatically generated in:
+
+```text
+results/metrics/
+```
+
+including:
+
+```text
+fidelity_vs_noise_theory.png
+fidelity_vs_noise_enhanced.png
+
+fidelity_table_theory.txt
+fidelity_table_enhanced.txt
+
+fidelity_analysis_results_theory.npz
+fidelity_analysis_results_enhanced.npz
+```
