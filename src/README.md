@@ -111,3 +111,52 @@ fidelity_table_enhanced.txt
 fidelity_analysis_results_theory.npz
 fidelity_analysis_results_enhanced.npz
 ```
+### 6. Experimental chain reconstruction
+
+Experimental STM spectra can be processed using the trained ensemble models to reconstruct bond-resolved exchange couplings \(J_n\).
+
+The script operates directly on symmetrized experimental spectra.
+
+Expected file naming:
+
+```text
+data/experimental/{CHAIN_NAME}_L{L}_SYM.csv
+```
+
+Example:
+
+```text
+data/experimental/ChainIH_L4_SYM.csv
+data/experimental/ChainIH_L6_SYM.csv
+data/experimental/ChainIH_L10_SYM.csv
+```
+
+Each CSV file must contain the columns:
+
+```text
+bias_meV
+site
+didv_A
+```
+
+Example usage:
+
+```bash
+python src/predict_experimental_chains.py \
+  --chain ChainIH \
+  --lengths 4,6,8,10,16 \
+  --seed 43 \
+  --mode enhanced \
+  --cut 50
+```
+
+The script:
+
+1. loads the symmetrized STM spectra
+2. applies bias cutoff and resampling
+3. performs baseline subtraction and normalization
+4. predicts local exchange couplings using the neural-network ensemble
+5. reconstructs the corresponding Heisenberg Hamiltonian
+6. computes the excitation gap using DMRGPy
+
+The `enhanced` ensemble is recommended for experimental inference.
