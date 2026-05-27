@@ -24,12 +24,8 @@ The method allows the extraction of spatially varying exchange interactions \(J_
 
 ```text
 data/           Experimental and synthetic datasets
-src/            Core source code
-notebooks/      Jupyter notebooks
 models/         Trained neural network models
 results/        Predictions and reconstructed couplings
-figures/        Generated figures
-paper/          Manuscript and supplementary information
 ```
 
 ---
