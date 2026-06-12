@@ -1,9 +1,9 @@
-# Learning the Exchange Couplings of Inhomogeneous Heisenberg Chains
+# Learning Inhomogeneous Heisenberg Hamiltonians in Nanographene Spin Chains
 
 This repository contains the code and datasets accompanying the paper:
 
-> *Learning the Exchange Couplings of Inhomogeneous Heisenberg Chains*  
-> Greta Lupi, Gonçalo Catarina, Saketh Ravuri, Chenxiao Zhao, Cesare Roncaglia, Jose L. Lado, Daniele Passerone, and Roman Fasel.
+> *Learning Inhomogeneous Heisenberg Hamiltonians in Nanographene Spin Chains*  
+> Greta Lupi, Saketh Ravuri, Chenxiao Zhao, Cesare Roncaglia, Jose L. Lado, Daniele Passerone, Roman Fasel, and Gonçalo Catarina.
 
 ## Overview
 
@@ -63,8 +63,8 @@ If you use this repository, please cite:
 
 ```bibtex
 @article{lupi2026,
-  title={Learning the Exchange Couplings of Inhomogeneous Heisenberg Chains},
-  author={Lupi, Greta and Catarina, Gonçalo and Ravuri, Saketh and Zhao, Chenxiao and Roncaglia, Cesare and Lado, Jose L. and Passerone, Daniele and Fasel, Roman},
+  title={Learning Inhomogeneous Heisenberg Hamiltonians in Nanographene Spin Chains},
+  author={Lupi, Greta and Ravuri, Saketh and Zhao, Chenxiao and Roncaglia, Cesare and Lado, Jose L. and Passerone, Daniele and Fasel, Roman and Catarina, Gonçalo},
   year={2026}
 }
 ```
