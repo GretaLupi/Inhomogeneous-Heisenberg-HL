@@ -3,7 +3,7 @@
 This repository contains the code and datasets accompanying the paper:
 
 > *Learning Inhomogeneous Heisenberg Hamiltonians in Nanographene Spin Chains*  
-> Greta Lupi, Saketh Ravuri, Chenxiao Zhao, Weidan Zhang, Cesare Roncaglia, Xinliang Feng, Daniele Passerone, Pascal Ruffieux, Roman Fasel, Jose L. Lado, and Gonçalo Catarina.
+> Greta Lupi, Saketh Ravuri, Chenxiao Zhao, Weidan Zhang, Cesare Roncaglia, Renxiang Liu, Xinliang Feng, Daniele Passerone, Pascal Ruffieux, Roman Fasel, Jose L. Lado, and Gonçalo Catarina.
 
 ## Overview
 
@@ -64,7 +64,7 @@ If you use this repository, please cite:
 ```bibtex
 @article{lupi2026,
   title={Learning Inhomogeneous Heisenberg Hamiltonians in Nanographene Spin Chains},
-  author={Lupi, Greta and Ravuri, Saketh and Zhao, Chenxiao and Zhang, Weidan and Roncaglia, Cesare and Feng, Xinliang and Passerone, Daniele and Ruffieux, Pascal and Fasel, Roman and Lado, Jose L. and Catarina, Gonçalo},
+  author={Lupi, Greta and Ravuri, Saketh and Zhao, Chenxiao and Zhang, Weidan and Roncaglia, Cesare and Liu, Renxiang and Feng, Xinliang and Passerone, Daniele and Ruffieux, Pascal and Fasel, Roman and Lado, Jose L. and Catarina, Gonçalo},
   year={2026}
 }
 ```
