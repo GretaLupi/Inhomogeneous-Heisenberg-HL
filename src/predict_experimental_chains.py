@@ -242,7 +242,7 @@ def run_predict_for_seed(
     lengths,
     cut_mev=50,
     n_repeats=1,
-    model_mode="enhanced",
+    model_mode="mixed",
     data_dir=None,
     output_dir=None,
 ):
@@ -356,7 +356,9 @@ def main():
     parser.add_argument("--chain", type=str, required=True)
     parser.add_argument("--lengths", type=str, required=True)
     parser.add_argument("--seed", type=int, required=True)
-    parser.add_argument("--mode", choices=["enhanced", "theory"], default="enhanced")
+    # mixed: retrained ensemble of the revised manuscript (chains of 4, 6 and 12 sites);
+    # enhanced: original ensemble (12-site chains only); theory: ideal-data benchmark
+    parser.add_argument("--mode", choices=["mixed", "enhanced", "theory"], default="mixed")
     parser.add_argument("--cut", type=float, default=50.0)
     parser.add_argument("--n-repeats", type=int, default=1)
     parser.add_argument(

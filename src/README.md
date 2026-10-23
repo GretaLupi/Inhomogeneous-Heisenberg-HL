@@ -6,6 +6,19 @@
 python src/generate_dataset.py
 ```
 
+The four- and six-site chains of the retrained ensemble are generated in blocks of 100
+chains and then merged into `data/synthetic/dataset_L{4,6}_{30_40,35_45}.npz`
+(1500 chains each). Everything except the chain length is as in `generate_dataset.py`.
+
+```bash
+for i in $(seq 0 14); do
+  python src/generate_short_chains.py --L 4 --jlo 3.0 --jhi 4.0 --index $i --outdir blocks
+done
+python src/generate_short_chains.py --merge --L 4 --jlo 3.0 --jhi 4.0 --outdir blocks
+```
+
+and the same for `--L 6` and for the window `--jlo 3.5 --jhi 4.5`.
+
 ---
 
 ### 2. Train on ideal theoretical data
@@ -38,6 +51,21 @@ python src/train_ensemble.py \
   --cut-mev 50 \
   --n-enhance 1 \
   --noise 0.002
+```
+
+This reproduces the ensemble of the first version (`enhanced_seed_*`).
+
+---
+
+### 3b. Train the retrained experimental-like ensemble
+
+This reproduces the ensemble used in the revised manuscript (`mixed_seed_*`): the same
+model and preprocessing as above, trained on the twelve-site chains together with the
+four- and six-site chains. The defaults read all six datasets in `data/synthetic/` and
+write `models/trained_models/mixed_seed_<seed>`.
+
+```bash
+python src/train_mixed.py --seed 43
 ```
 
 ---
@@ -144,9 +172,9 @@ Example usage:
 ```bash
 python src/predict_experimental_chains.py \
   --chain ChainIH \
-  --lengths 4,6,8,10,16 \
+  --lengths 4,6,10,16 \
   --seed 43 \
-  --mode enhanced \
+  --mode mixed \
   --cut 50
 ```
 
@@ -159,4 +187,4 @@ The script:
 5. reconstructs the corresponding Heisenberg Hamiltonian
 6. computes the excitation gap using DMRGPy
 
-The `enhanced` ensemble is recommended for experimental inference.
+The `mixed` ensemble (the default) is recommended for experimental inference and is the one used in the revised manuscript. Use `--mode enhanced` to reproduce the first version. The predicted couplings are saved in dataset units (meV/10).
